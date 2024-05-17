@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Perfil do Usuário</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="header_profile">
+        <button id="logo" class="logo">Minercon ₿</button>
+    </div>
+    <div class="center-box" id="profileBox">
+        <div id="userInfo">
+            <div id="userId"></div>
+            <div id="totalMined"></div>
+        </div>
+        <div class="conversion-options">
+            <button id="convertToBRL">Converter para Real</button>
+            <div id="resultBRL" class="conversion-result hidden"></div>
+            <button id="convertToUSD">Converter para Dólar</button>
+            <div id="resultUSD" class="conversion-result hidden"></div>
+        </div>
+        <button id="backToMiningBtn">Voltar para Mineração</button>
+    </div>
+    
+    
+
+    <script>
+        const userId = localStorage.getItem('userId');
+    
+        document.getElementById('backToMiningBtn').addEventListener('click', function() {
+            window.location.href = 'mining.html';
+        });
+    
+        function fetchAndUpdateUserInfo() {
+            fetch(`https://mineradoraapi-fda524168c07.herokuapp.com/user_info?user_id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById('userInfo').textContent = 'Erro ao obter informações do usuário.';
+                        console.error(data.error);
+                    } else {
+                        document.getElementById('userId').textContent = `Usuário: ${data.user_id}`;
+                        document.getElementById('totalMined').textContent = `Total Minerado: ${data.total_mined.toFixed(12)} BTC`;
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('userInfo').textContent = 'Falha ao conectar ao servidor.';
+                    console.error('Erro ao obter informações do usuário: ', error);
+                });
+        }
+    
+        function fetchBtcValues() {
+            return fetch('https://mineradoraapi-fda524168c07.herokuapp.com/get_btc_values')
+                .then(response => response.json())
+                .then(data => {
+                    return data;
+                })
+                .catch(error => {
+                    console.error('Failed to fetch BTC values:', error);
+                    return null;
+                });
+        }
+    
+        document.getElementById('convertToBRL').addEventListener('click', async function() {
+            const btcValues = await fetchBtcValues();
+            if (btcValues) {
+                const btcToBRL = btcValues.BTC_BRL;
+                const totalMined = parseFloat(document.getElementById('totalMined').textContent.split(' ')[2]);
+                const convertedValue = totalMined * btcToBRL;
+                const resultBRL = document.getElementById('resultBRL');
+                resultBRL.textContent = `Total em BRL: R$ ${convertedValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+                resultBRL.classList.remove('hidden');
+                resultBRL.style.maxHeight = '50px';
+                resultBRL.style.opacity = 1;
+            }
+        });
+    
+        document.getElementById('convertToUSD').addEventListener('click', async function() {
+            const btcValues = await fetchBtcValues();
+            if (btcValues) {
+                const btcToUSD = btcValues.BTC_USD;
+                const totalMined = parseFloat(document.getElementById('totalMined').textContent.split(' ')[2]);
+                const convertedValue = totalMined * btcToUSD;
+                const resultUSD = document.getElementById('resultUSD');
+                resultUSD.textContent = `Total em USD: $ ${convertedValue.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+                resultUSD.classList.remove('hidden');
+                resultUSD.style.maxHeight = '50px';
+                resultUSD.style.opacity = 1;
+            }
+        });
+    
+        window.onload = function() {
+            fetchAndUpdateUserInfo();
+            setInterval(fetchAndUpdateUserInfo, 10000);
+        };
+    </script>
+    
+</body>
+</html>

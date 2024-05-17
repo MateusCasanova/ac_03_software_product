@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Minercon</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="header_land">
+        <button id="logo" class="logo">Minercon ₿</button>
+    </div>
+    <div class="center-box">
+        <button id="loginBtn">Login</button>
+        <button id="registerBtn">Registro</button>
+    </div>
+
+    <div class="center-box hidden" id="loginForm">
+        <input type="text" id="loginUsername" placeholder="Usuário">
+        <input type="password" id="loginPassword" placeholder="Senha">
+        <button onclick="login()">Entrar</button>
+        <button onclick="showMainButtons()">Voltar</button>
+    </div>
+
+    <div class="center-box hidden" id="registerForm">
+        <input type="text" id="registerUsername" placeholder="Usuário">
+        <input type="password" id="registerPassword" placeholder="Senha">
+        <button onclick="register()">Criar Usuário</button>
+        <button onclick="showMainButtons()">Voltar</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
